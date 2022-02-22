@@ -34,7 +34,7 @@ func randString() string {
 func main() {
 	var (
 		port         = flag.Int("port", 8080, "Callback port")
-		path         = flag.String("path", "/oauth/callback", "Callback path")
+		redirectUri  = flag.String("redirectUri", "https://localhost/callback", "Redirect or callback")
 		clientID     = flag.String("id", "", "Client ID")
 		clientSecret = flag.String("secret", "", "Client secret")
 		authURL      = flag.String("auth", "https://localhost/oauth/authorize", "Authorization URL")
@@ -48,7 +48,7 @@ func main() {
 		ClientID:     *clientID,
 		ClientSecret: *clientSecret,
 		Scopes:       scopes,
-		RedirectURL:  fmt.Sprintf("http://127.0.0.1:%d%s", *port, *path),
+		RedirectURL:  *redirectUri,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  *authURL,
 			TokenURL: *tokenURL,
@@ -63,7 +63,7 @@ func main() {
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	http.HandleFunc(*path, func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc(*redirectUri, func(w http.ResponseWriter, r *http.Request) {
 		defer wg.Done()
 
 		if s := r.URL.Query().Get("state"); s != state {
